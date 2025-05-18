@@ -12,7 +12,11 @@ const limiter = rateLimit({
 });
 
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: '*',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['Content-Type']
+}));
 app.use(express.json());
 app.use(express.static(__dirname));
 
@@ -35,6 +39,10 @@ app.post('/api/chat', async (req, res) => {
         console.log('Mensaje recibido:', req.body);
         const { message } = req.body;
         
+        if (!message || typeof message !== 'string') {
+            return res.status(400).json({ error: 'Mensaje no válido' });
+        }
+
         const response = await fetch(`${API_URL}?key=${API_KEY}`, {
             method: 'POST',
             headers: {
@@ -47,24 +55,27 @@ app.post('/api/chat', async (req, res) => {
             })
         });
 
-        console.log('Respuesta de la API:', response.status, await response.text());
-        
         const data = await response.json();
         console.log('Datos recibidos:', data);
         
         if (!response.ok) {
+            console.error('Error de API:', data.error);
             throw new Error(`Error en la API: ${response.status} - ${data.error?.message || 'Error desconocido'}`);
         }
 
-        const text = data.candidates[0]?.content?.parts[0]?.text;
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
         if (!text) {
+            console.error('Respuesta vacía:', data);
             throw new Error('Respuesta vacía de la API');
         }
 
         res.json({ response: text });
     } catch (error) {
-        console.error('Error detallado:', error.message);
-        res.status(500).json({ error: error.message || 'Error al procesar el mensaje' });
+        console.error('Error detallado:', error);
+        res.status(500).json({ 
+            error: 'Error al procesar el mensaje',
+            details: error.message 
+        });
     }
 });
 
