@@ -5,6 +5,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
 </head>
+<script>
+    // Código de prueba para la API
+    fetch('http://localhost:3000/api/chat', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            message: 'Hola, ¿quién eres?'
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log('Respuesta:', data.response);
+    })
+    .catch(err => {
+        console.error('Error:', err);
+    });
+</script>
 <body>
     
 </body>
