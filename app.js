@@ -40,7 +40,7 @@ app.post('/api/chat', async (req, res) => {
     }
 
     const completion = await groq.chat.completions.create({
-      model: 'meta-llama/llama-prompt-guard-2-22m',
+      model: 'llama-3.3-70b-versatile',
       messages: [
         { role: 'user', content: message }
       ]
